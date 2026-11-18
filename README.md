@@ -2,7 +2,7 @@
 
 **Enterprise Knowledge EvalOps** is a planned platform for building, securing, and evaluating AI assistants over enterprise documents. The goal is to compare retrieval and agent approaches while enforcing access rules wherever knowledge is read or exposed.
 
-> **Project status:** Early scaffold. This repository contains the planned folder structure and a placeholder `eke-ops` command. The platform features below are a development roadmap, not working functionality.
+> **Project status:** Phase 1 in progress. The API now supports demo-only identity and permission-aware document reads with audit records. Production authentication, retrieval, evaluation, and the dashboard are still planned.
 
 ## What the project aims to do
 
@@ -34,14 +34,57 @@
 
 `modules/` has empty packages for `identity`, `knowledge`, `retrieval`, `agents`, `evaluation`, `experiments`, and `observability`. The retrieval package also has `ports/` for interfaces and `adapters/` for implementations. These folders establish boundaries only; choose concrete classes and files as you build each feature.
 
-The package requires Python 3.14 or newer. To run the current placeholder command with [uv](https://docs.astral.sh/uv/):
+The package requires Python 3.12 or newer. The project selects Python 3.12 by default through `.python-version`. To run the current placeholder command with [uv](https://docs.astral.sh/uv/):
 
 ```bash
 uv sync
 uv run eke-ops
 ```
 
-It currently prints `Hello from eke-ops!`. There is no API, database, retrieval pipeline, or dashboard yet.
+The placeholder CLI still prints `Hello from eke-ops!`. The API provides `GET /health`, `GET /documents`, and `GET /documents/{document_id}`.
+
+## Run the Phase 0 API locally
+
+You need [uv](https://docs.astral.sh/uv/) and Docker with Compose. In WSL, enable Docker Desktop integration for the distro first. The Compose file binds PostgreSQL to localhost only and uses development credentials.
+
+```bash
+uv sync
+cp .env.example .env
+docker compose up -d postgres
+uv run alembic upgrade head
+uv run uvicorn eke_ops.api.app:app --reload
+```
+
+In another terminal:
+
+```bash
+curl http://127.0.0.1:8000/health
+# {"status":"ok","database":"ok"}
+```
+
+Open `http://127.0.0.1:8000/` or `/docs` for the interactive Swagger UI. The OpenAPI JSON is at `/openapi.json`. Expand the **System** section and use **Try it out** on `GET /health` to call the API from your browser.
+
+### Try Phase 1 document access
+
+The example `.env` enables fixture identity with `ENABLE_DEMO_AUTH=true`. This mode trusts the `X-Demo-User` header and is for local development only. With the demo fixture loaded, compare the same document as different users:
+
+```bash
+curl -H 'X-Demo-User: user-fin' http://127.0.0.1:8000/documents/doc-atlas-budget
+curl -i -H 'X-Demo-User: user-eng' http://127.0.0.1:8000/documents/doc-atlas-budget
+curl -H 'X-Demo-User: user-cross' http://127.0.0.1:8000/documents
+```
+
+The Finance user receives the budget document, while the Engineering user gets a 404. The cross-functional user can list both Engineering and Finance documents for Atlas. Each document read decision is saved in `eke_demo.audit_events`. If `ENABLE_DEMO_AUTH` is absent or false, document endpoints return 503 until a production identity provider is configured. No token or OIDC validation is implemented yet.
+
+`DATABASE_URL` uses SQLAlchemy's `postgresql+psycopg://` form. To load the synthetic demo fixture into the migrated database, use a libpq URL for `psql`:
+
+```bash
+export PSQL_DATABASE_URL=postgresql://eke_ops:eke_ops@localhost:5432/eke_ops
+uv run python mock_data/seed.py | psql -X -v ON_ERROR_STOP=1 "$PSQL_DATABASE_URL"
+psql -X "$PSQL_DATABASE_URL" -c 'SELECT count(*) FROM eke_demo.document_chunks;'
+```
+
+The migration creates the same initial demo tables as `mock_data/schema.sql`. Use `uv run alembic upgrade head` for application setup; `mock_data/schema.sql` remains a standalone fixture helper. Configuration is read from environment variables or `.env`. The implementation plan is in [PLAN.md](PLAN.md).
 
 ## Mock data
 
@@ -57,11 +100,11 @@ print(demo["evaluation_dataset"]["cases"][0]["expected_answer"])
 
 The fixture is intended for future ingestion, authorization, retrieval, and evaluation tests. Its names and contents are invented.
 
-To load the fixture into PostgreSQL, create an empty database and set `DATABASE_URL` to its connection string. The schema and seed are repeatable; seeding updates rows with the same fixture IDs.
+To load the fixture into PostgreSQL after the Phase 0 setup above, use the migrated database and the `PSQL_DATABASE_URL` value shown there. Seeding updates rows with the same fixture IDs.
 
 ```bash
-psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f mock_data/schema.sql
-python mock_data/seed.py | psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL"
+uv run alembic upgrade head
+uv run python mock_data/seed.py | psql -X -v ON_ERROR_STOP=1 "$PSQL_DATABASE_URL"
 ```
 
 The tables live in the `eke_demo` schema. For example, inspect which chunks the Engineering user can read in the demo:
@@ -79,9 +122,9 @@ The view illustrates tenant, project, and department filtering. It does not repl
 For load testing and for tests with many users, [`mock_data/generate.py`](mock_data/generate.py) builds a larger synthetic dataset with the same tables. It uses only the standard library. The output is deterministic for a given `--seed`, and generation fails if any expected evidence breaks the access rule used by `authorized_chunks`.
 
 ```bash
-python mock_data/generate.py --scale large        # small | medium | large | xlarge
-psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f mock_data/schema.sql
-psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f mock_data/generated/large/load.sql
+uv run python mock_data/generate.py --scale large        # small | medium | large | xlarge
+uv run alembic upgrade head
+psql -X -v ON_ERROR_STOP=1 "$PSQL_DATABASE_URL" -f mock_data/generated/large/load.sql
 ```
 
 | Scale | Orgs | Users | Documents | Eval cases | Experiment results |
