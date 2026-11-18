@@ -43,6 +43,61 @@ uv run eke-ops
 
 It currently prints `Hello from eke-ops!`. There is no API, database, retrieval pipeline, or dashboard yet.
 
+## Mock data
+
+[`mock_data/demo.json`](mock_data/demo.json) contains synthetic organizations, users, access-scoped document chunks, evaluation cases, and an illustrative experiment run. It covers two tenants and three projects, including Engineering, Finance, Operations, and Security records. Four cases ask the same Atlas question as Engineering, Finance, a cross-functional user, and a user from another tenant; the other cases cover project and department-specific questions. Each case lists only the relevant evidence that user may access. These are fictional development records, loaded into PostgreSQL with the commands below; the application does not load them automatically yet.
+
+```python
+import json
+from pathlib import Path
+
+demo = json.loads(Path("mock_data/demo.json").read_text())
+print(demo["evaluation_dataset"]["cases"][0]["expected_answer"])
+```
+
+The fixture is intended for future ingestion, authorization, retrieval, and evaluation tests. Its names and contents are invented.
+
+To load the fixture into PostgreSQL, create an empty database and set `DATABASE_URL` to its connection string. The schema and seed are repeatable; seeding updates rows with the same fixture IDs.
+
+```bash
+psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f mock_data/schema.sql
+python mock_data/seed.py | psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL"
+```
+
+The tables live in the `eke_demo` schema. For example, inspect which chunks the Engineering user can read in the demo:
+
+```sql
+SELECT chunk_id, text
+FROM eke_demo.authorized_chunks
+WHERE user_id = 'user-eng';
+```
+
+The view illustrates tenant, project, and department filtering. It does not replace application authentication or database access controls.
+
+### Large generated data
+
+For load testing and for tests with many users, [`mock_data/generate.py`](mock_data/generate.py) builds a larger synthetic dataset with the same tables. It uses only the standard library. The output is deterministic for a given `--seed`, and generation fails if any expected evidence breaks the access rule used by `authorized_chunks`.
+
+```bash
+python mock_data/generate.py --scale large        # small | medium | large | xlarge
+psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f mock_data/schema.sql
+psql -X -v ON_ERROR_STOP=1 "$DATABASE_URL" -f mock_data/generated/large/load.sql
+```
+
+| Scale | Orgs | Users | Documents | Eval cases | Experiment results |
+| --- | --- | --- | --- | --- | --- |
+| small | 2 | 50 | 160 | 80 | 320 |
+| medium | 5 | 1,000 | 3,000 | 1,500 | 6,000 |
+| large | 10 | 10,000 | 25,000 (~52k chunks) | 10,000 | 80,000 |
+| xlarge | 20 | 100,000 | 100,000 | 40,000 | 320,000 |
+
+Override any size with `--orgs`, `--users-per-org`, `--docs-per-org`, `--cases-per-org`, or `--runs-per-config`. Output goes to `mock_data/generated/<scale>/` (git-ignored):
+
+- `fixture.json` has the same records as `demo.json`, but `evaluation_datasets` and `experiments` are lists, and each experiment has a `runs` list. Each case also carries `case_type` (`authorized`, `denied`, `cross_tenant`, or `compound`) and `target_chunk_ids`, the chunks that answer the question whether or not the user may read them.
+- `load.sql` uses `COPY` and replaces all rows whose IDs start with `gen-`, so it can be loaded next to the demo fixture and reloaded safely.
+
+Project codenames repeat across tenants on purpose. Each experiment includes a `dense-unfiltered` configuration that ignores access rules and therefore retrieves forbidden chunks, which gives leak-detection tests known positives.
+
 ## Planned architecture
 
 ```mermaid

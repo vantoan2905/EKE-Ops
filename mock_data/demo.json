@@ -1,0 +1,209 @@
+{
+  "fixture_version": "1.0",
+  "description": "Synthetic, static records for the access-controlled retrieval and evaluation demo. No real people or company data.",
+  "organizations": [
+    {"id": "org-northstar", "name": "Northstar Devices"},
+    {"id": "org-harbor", "name": "Harbor Labs"}
+  ],
+  "workspaces": [
+    {"id": "ws-northstar", "organization_id": "org-northstar", "name": "Internal Knowledge"},
+    {"id": "ws-harbor", "organization_id": "org-harbor", "name": "Research"}
+  ],
+  "users": [
+    {"id": "user-eng", "organization_id": "org-northstar", "name": "Alex Engineer", "role": "Employee", "departments": ["engineering"], "projects": ["atlas", "orion"]},
+    {"id": "user-fin", "organization_id": "org-northstar", "name": "Blair Finance", "role": "Employee", "departments": ["finance"], "projects": ["atlas", "orion"]},
+    {"id": "user-cross", "organization_id": "org-northstar", "name": "Casey Lead", "role": "Knowledge Manager", "departments": ["engineering", "finance"], "projects": ["atlas"]},
+    {"id": "user-ops", "organization_id": "org-northstar", "name": "Morgan Operations", "role": "Employee", "departments": ["operations"], "projects": ["atlas"]},
+    {"id": "user-sec", "organization_id": "org-northstar", "name": "Riley Security", "role": "Employee", "departments": ["security"], "projects": ["atlas"]},
+    {"id": "user-other", "organization_id": "org-harbor", "name": "Dana Researcher", "role": "Employee", "departments": ["research"], "projects": ["tidal"]},
+    {"id": "user-harbor-fin", "organization_id": "org-harbor", "name": "Taylor Finance", "role": "Employee", "departments": ["finance"], "projects": ["tidal"]}
+  ],
+  "documents": [
+    {
+      "id": "doc-atlas-release", "organization_id": "org-northstar", "workspace_id": "ws-northstar",
+      "title": "Atlas release plan", "version": 1, "owner_user_id": "user-eng",
+      "classification": "internal", "departments": ["engineering"], "projects": ["atlas"],
+      "chunks": [
+        {"id": "chunk-atlas-release-1", "text": "The Atlas pilot release is scheduled for 15 March 2027. Engineering will finish the security review by 1 March 2027."},
+        {"id": "chunk-atlas-release-2", "text": "The pilot includes SSO, document search, and audit logging. Graph search is excluded from the pilot."}
+      ]
+    },
+    {
+      "id": "doc-atlas-budget", "organization_id": "org-northstar", "workspace_id": "ws-northstar",
+      "title": "Atlas pilot budget", "version": 2, "owner_user_id": "user-fin",
+      "classification": "confidential", "departments": ["finance"], "projects": ["atlas"],
+      "chunks": [
+        {"id": "chunk-atlas-budget-1", "text": "The approved Atlas pilot budget is USD 120,000. Finance reserved USD 20,000 of that total for security testing."},
+        {"id": "chunk-atlas-budget-2", "text": "The pilot budget covers the March 2027 release only. Expansion funding requires a separate approval."}
+      ]
+    },
+    {
+      "id": "doc-atlas-overview", "organization_id": "org-northstar", "workspace_id": "ws-northstar",
+      "title": "Atlas project overview", "version": 1, "owner_user_id": "user-cross",
+      "classification": "internal", "departments": [], "projects": ["atlas"],
+      "chunks": [
+        {"id": "chunk-atlas-overview-1", "text": "Atlas is Northstar Devices' internal knowledge pilot. Engineering owns the release plan and Finance owns the budget."}
+      ]
+    },
+    {
+      "id": "doc-tidal-plan", "organization_id": "org-harbor", "workspace_id": "ws-harbor",
+      "title": "Tidal research plan", "version": 1, "owner_user_id": "user-other",
+      "classification": "internal", "departments": ["research"], "projects": ["tidal"],
+      "chunks": [
+        {"id": "chunk-tidal-plan-1", "text": "Harbor Labs will review the Tidal prototype in April 2027."}
+      ]
+    },
+    {
+      "id": "doc-atlas-operations", "organization_id": "org-northstar", "workspace_id": "ws-northstar",
+      "title": "Atlas pilot operations FAQ", "version": 1, "owner_user_id": "user-ops",
+      "classification": "internal", "departments": [], "projects": ["atlas"],
+      "chunks": [
+        {"id": "chunk-atlas-operations-1", "text": "The Atlas pilot help desk is staffed on weekdays from 09:00 to 17:00. Employees should report access problems through the internal service portal."},
+        {"id": "chunk-atlas-operations-2", "text": "Pilot users may search approved documents and review source citations. The help desk cannot grant access to restricted documents."}
+      ]
+    },
+    {
+      "id": "doc-atlas-runbook", "organization_id": "org-northstar", "workspace_id": "ws-northstar",
+      "title": "Atlas engineering runbook", "version": 3, "owner_user_id": "user-eng",
+      "classification": "internal", "departments": ["engineering"], "projects": ["atlas"],
+      "chunks": [
+        {"id": "chunk-atlas-runbook-1", "text": "Deploy Atlas to staging on Tuesdays. Run the smoke tests for SSO, document search, and audit logging before promoting a release."},
+        {"id": "chunk-atlas-runbook-2", "text": "If search latency exceeds 800 ms for 15 minutes, roll back the latest index build and notify the on-call engineer."}
+      ]
+    },
+    {
+      "id": "doc-atlas-forecast", "organization_id": "org-northstar", "workspace_id": "ws-northstar",
+      "title": "Atlas cost forecast", "version": 1, "owner_user_id": "user-fin",
+      "classification": "confidential", "departments": ["finance"], "projects": ["atlas"],
+      "chunks": [
+        {"id": "chunk-atlas-forecast-1", "text": "Finance forecasts USD 8,000 per month for Atlas hosting during the pilot. This operating forecast is separate from the approved USD 120,000 pilot budget."},
+        {"id": "chunk-atlas-forecast-2", "text": "The forecast assumes 300 pilot users and 40,000 document searches per month."}
+      ]
+    },
+    {
+      "id": "doc-atlas-security", "organization_id": "org-northstar", "workspace_id": "ws-northstar",
+      "title": "Atlas security review checklist", "version": 1, "owner_user_id": "user-sec",
+      "classification": "confidential", "departments": ["security"], "projects": ["atlas"],
+      "chunks": [
+        {"id": "chunk-atlas-security-1", "text": "The Atlas pilot security review must verify tenant isolation, document-level access checks, and audit event completeness by 1 March 2027."},
+        {"id": "chunk-atlas-security-2", "text": "Reviewers should test cross-tenant search attempts and confirm that denied chunks never enter model context."}
+      ]
+    },
+    {
+      "id": "doc-orion-roadmap", "organization_id": "org-northstar", "workspace_id": "ws-northstar",
+      "title": "Orion engineering roadmap", "version": 1, "owner_user_id": "user-eng",
+      "classification": "internal", "departments": ["engineering"], "projects": ["orion"],
+      "chunks": [
+        {"id": "chunk-orion-roadmap-1", "text": "The Orion prototype review is planned for 20 May 2027. Engineering will demonstrate offline search and source synchronization."},
+        {"id": "chunk-orion-roadmap-2", "text": "Orion is a separate project from Atlas. Its prototype does not use the Atlas pilot budget."}
+      ]
+    },
+    {
+      "id": "doc-orion-budget", "organization_id": "org-northstar", "workspace_id": "ws-northstar",
+      "title": "Orion prototype budget", "version": 1, "owner_user_id": "user-fin",
+      "classification": "confidential", "departments": ["finance"], "projects": ["orion"],
+      "chunks": [
+        {"id": "chunk-orion-budget-1", "text": "The approved Orion prototype budget is USD 45,000. Finance will reassess funding after the May 2027 review."}
+      ]
+    },
+    {
+      "id": "doc-tidal-runbook", "organization_id": "org-harbor", "workspace_id": "ws-harbor",
+      "title": "Tidal research runbook", "version": 2, "owner_user_id": "user-other",
+      "classification": "internal", "departments": ["research"], "projects": ["tidal"],
+      "chunks": [
+        {"id": "chunk-tidal-runbook-1", "text": "The Tidal team records prototype findings every Friday. Researchers must attach a test log before closing an experiment."},
+        {"id": "chunk-tidal-runbook-2", "text": "The April 2027 review will compare prototype accuracy and response time against the baseline."}
+      ]
+    },
+    {
+      "id": "doc-tidal-budget", "organization_id": "org-harbor", "workspace_id": "ws-harbor",
+      "title": "Tidal prototype budget", "version": 1, "owner_user_id": "user-harbor-fin",
+      "classification": "confidential", "departments": ["finance"], "projects": ["tidal"],
+      "chunks": [
+        {"id": "chunk-tidal-budget-1", "text": "Harbor Labs approved USD 30,000 for the Tidal prototype. The allocation covers testing through April 2027."}
+      ]
+    }
+  ],
+  "evaluation_dataset": {
+    "id": "dataset-atlas-access", "version": 1, "organization_id": "org-northstar",
+    "cases": [
+      {
+        "id": "case-eng", "user_id": "user-eng",
+        "question": "When is the Atlas pilot release, and what is its approved budget?",
+        "authorized_relevant_chunk_ids": ["chunk-atlas-release-1"],
+        "expected_answer": "The Atlas pilot release is scheduled for 15 March 2027. The approved budget is not available to this user.",
+        "expected_citation_chunk_ids": ["chunk-atlas-release-1"]
+      },
+      {
+        "id": "case-fin", "user_id": "user-fin",
+        "question": "When is the Atlas pilot release, and what is its approved budget?",
+        "authorized_relevant_chunk_ids": ["chunk-atlas-budget-1"],
+        "expected_answer": "The approved Atlas pilot budget is USD 120,000. The release date is not available to this user.",
+        "expected_citation_chunk_ids": ["chunk-atlas-budget-1"]
+      },
+      {
+        "id": "case-cross", "user_id": "user-cross",
+        "question": "When is the Atlas pilot release, and what is its approved budget?",
+        "authorized_relevant_chunk_ids": ["chunk-atlas-release-1", "chunk-atlas-budget-1"],
+        "expected_answer": "The Atlas pilot release is scheduled for 15 March 2027, and its approved budget is USD 120,000.",
+        "expected_citation_chunk_ids": ["chunk-atlas-release-1", "chunk-atlas-budget-1"]
+      },
+      {
+        "id": "case-ops", "user_id": "user-ops",
+        "question": "When is the Atlas help desk staffed?",
+        "authorized_relevant_chunk_ids": ["chunk-atlas-operations-1"],
+        "expected_answer": "The Atlas pilot help desk is staffed on weekdays from 09:00 to 17:00.",
+        "expected_citation_chunk_ids": ["chunk-atlas-operations-1"]
+      },
+      {
+        "id": "case-security", "user_id": "user-sec",
+        "question": "What must the Atlas security review verify?",
+        "authorized_relevant_chunk_ids": ["chunk-atlas-security-1"],
+        "expected_answer": "It must verify tenant isolation, document-level access checks, and audit event completeness by 1 March 2027.",
+        "expected_citation_chunk_ids": ["chunk-atlas-security-1"]
+      },
+      {
+        "id": "case-orion-eng", "user_id": "user-eng",
+        "question": "When is the Orion prototype review?",
+        "authorized_relevant_chunk_ids": ["chunk-orion-roadmap-1"],
+        "expected_answer": "The Orion prototype review is planned for 20 May 2027.",
+        "expected_citation_chunk_ids": ["chunk-orion-roadmap-1"]
+      },
+      {
+        "id": "case-orion-fin", "user_id": "user-fin",
+        "question": "What is the approved Orion prototype budget?",
+        "authorized_relevant_chunk_ids": ["chunk-orion-budget-1"],
+        "expected_answer": "The approved Orion prototype budget is USD 45,000.",
+        "expected_citation_chunk_ids": ["chunk-orion-budget-1"]
+      },
+      {
+        "id": "case-other", "user_id": "user-other",
+        "question": "When is the Atlas pilot release, and what is its approved budget?",
+        "authorized_relevant_chunk_ids": [],
+        "expected_answer": "I cannot answer from the information available to you.",
+        "expected_citation_chunk_ids": []
+      }
+    ]
+  },
+  "experiment": {
+    "id": "experiment-atlas-demo", "dataset_id": "dataset-atlas-access", "dataset_version": 1,
+    "configurations": [
+      {"id": "config-dense", "retriever": "dense", "top_k": 3},
+      {"id": "config-hybrid", "retriever": "hybrid", "top_k": 3}
+    ],
+    "example_run": {
+      "id": "run-atlas-hybrid-example", "configuration_id": "config-hybrid",
+      "status": "illustrative", "evaluator_version": "demo-1",
+      "results": [
+        {"case_id": "case-eng", "retrieved_chunk_ids": ["chunk-atlas-release-1", "chunk-atlas-overview-1"], "answer_citation_chunk_ids": ["chunk-atlas-release-1"], "latency_ms": 420, "input_tokens": 180, "output_tokens": 38},
+        {"case_id": "case-fin", "retrieved_chunk_ids": ["chunk-atlas-budget-1", "chunk-atlas-overview-1"], "answer_citation_chunk_ids": ["chunk-atlas-budget-1"], "latency_ms": 460, "input_tokens": 174, "output_tokens": 39},
+        {"case_id": "case-cross", "retrieved_chunk_ids": ["chunk-atlas-release-1", "chunk-atlas-budget-1", "chunk-atlas-overview-1"], "answer_citation_chunk_ids": ["chunk-atlas-release-1", "chunk-atlas-budget-1"], "latency_ms": 510, "input_tokens": 230, "output_tokens": 43},
+        {"case_id": "case-ops", "retrieved_chunk_ids": ["chunk-atlas-operations-1", "chunk-atlas-overview-1"], "answer_citation_chunk_ids": ["chunk-atlas-operations-1"], "latency_ms": 390, "input_tokens": 145, "output_tokens": 24},
+        {"case_id": "case-security", "retrieved_chunk_ids": ["chunk-atlas-security-1", "chunk-atlas-overview-1"], "answer_citation_chunk_ids": ["chunk-atlas-security-1"], "latency_ms": 440, "input_tokens": 165, "output_tokens": 30},
+        {"case_id": "case-orion-eng", "retrieved_chunk_ids": ["chunk-orion-roadmap-1", "chunk-orion-roadmap-2"], "answer_citation_chunk_ids": ["chunk-orion-roadmap-1"], "latency_ms": 410, "input_tokens": 155, "output_tokens": 22},
+        {"case_id": "case-orion-fin", "retrieved_chunk_ids": ["chunk-orion-budget-1"], "answer_citation_chunk_ids": ["chunk-orion-budget-1"], "latency_ms": 370, "input_tokens": 125, "output_tokens": 18},
+        {"case_id": "case-other", "retrieved_chunk_ids": [], "answer_citation_chunk_ids": [], "latency_ms": 90, "input_tokens": 29, "output_tokens": 12}
+      ]
+    }
+  }
+}
